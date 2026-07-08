@@ -1,6 +1,8 @@
 from dataclasses import dataclass, field
 from typing import Any
 import numpy as np
+import heapq
+from mini_vectordb.similarity import cosine_similarity
 
 @dataclass
 class Record:
@@ -32,3 +34,15 @@ class VectorStore:
     
     def __len__(self)->int:
         return len(self._records)
+    
+    def search(self,query: np.ndarray, k:int=5)-> list[tuple[Record,float]]:
+        heap: list[tuple[float, str]] = []
+
+        for record_id, record in self._records.items():
+            score = cosine_similarity(query, record.vector)
+            heapq.heappush(heap, (score, record_id))
+            if len(heap)>k:
+                heapq.heappop(heap)
+            
+        results = sorted(heap, key=lambda x: x[0], reverse=True)
+        return [(self._records[record_id], score) for score, record_id in results]
