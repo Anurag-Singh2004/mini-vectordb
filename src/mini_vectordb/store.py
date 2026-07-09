@@ -3,6 +3,7 @@ from typing import Any
 import numpy as np
 import heapq
 from mini_vectordb.similarity import cosine_similarity
+from mini_vectordb.filters import matches_filter
 
 @dataclass
 class Record:
@@ -35,10 +36,13 @@ class VectorStore:
     def __len__(self)->int:
         return len(self._records)
     
-    def search(self,query: np.ndarray, k:int=5)-> list[tuple[Record,float]]:
+    def search(self,query: np.ndarray, k:int=5, metadata_filter: dict[str,Any] | None=None)-> list[tuple[Record,float]]:
         heap: list[tuple[float, str]] = []
 
         for record_id, record in self._records.items():
+            if metadata_filter is not None and not matches_filter(record.metadata, metadata_filter):
+                continue
+
             score = cosine_similarity(query, record.vector)
             heapq.heappush(heap, (score, record_id))
             if len(heap)>k:

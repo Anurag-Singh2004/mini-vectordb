@@ -82,3 +82,33 @@ def test_search_empty_store_returns_empty_list():
     store = VectorStore(dim=2)
     results = store.search(np.array([1.0, 0.0]), k=5)
     assert results == []
+
+def test_search_with_matching_filter():
+    store = VectorStore(dim=2)
+    store.add("a", np.array([1.0, 0.0]), metadata={"category": "fruit"})
+    store.add("b", np.array([0.9, 0.1]), metadata={"category": "fruit"})
+    store.add("c", np.array([0.95, 0.05]), metadata={"category": "animal"})
+
+    query = np.array([1.0, 0.0])
+    results = store.search(query, k=5, metadata_filter={"category": "fruit"})
+
+    ids = [record.id for record, _ in results]
+    assert set(ids) == {"a", "b"} #only fruit-tagged records returned
+    assert "c" not in ids    #animal-tagged excluded despite high similarity
+
+
+def test_search_with_filter_matching_nothing():
+    store = VectorStore(dim=2)
+    store.add("a", np.array([1.0, 0.0]), metadata={"category": "fruit"})
+
+    results = store.search(np.array([1.0, 0.0]), k=5, metadata_filter={"category": "vehicle"})
+    assert results == []
+
+
+def test_search_without_filter_unaffected():
+    store = VectorStore(dim=2)
+    store.add("a", np.array([1.0, 0.0]), metadata={"category": "fruit"})
+    store.add("b", np.array([0.0, 1.0]), metadata={"category": "animal"})
+
+    results = store.search(np.array([1.0, 0.0]), k=5)  #no filter passed
+    assert len(results) == 2  #both records considered, old behavior preserved
