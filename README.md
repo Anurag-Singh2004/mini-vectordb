@@ -5,7 +5,7 @@ A vector database built from scratch to understand how systems like ChromaDB and
 ## Features
 - [x] In-memory vector storage
 - [x] Brute-force cosine similarity search
-- [ ] Metadata filtering
+- [x] Metadata filtering
 - [ ] Persistence (save/load)
 
 ## Known Limitations
