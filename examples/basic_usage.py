@@ -20,6 +20,17 @@ def main():
     filtered_results = store.search(query, k=4, metadata_filter={"category": "fruit"})
     for record, score in filtered_results:
         print(f"id={record.id:15s} score={score:.4f}  text={record.text}")
+    
+    print("\n=== Persistence: save and reload ===")
+    store.save("example_store.json")
+    print("Saved to example_store.json")
+
+    reloaded_store = VectorStore.load("example_store.json")
+    print(f"Reloaded store has {len(reloaded_store)} records")
+
+    reloaded_results = reloaded_store.search(query, k=2)
+    for record, score in reloaded_results:
+        print(f"id={record.id:15s} score={score:.4f}  text={record.text}")
 
 if __name__ == "__main__":
     main()

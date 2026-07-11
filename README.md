@@ -6,7 +6,7 @@ A vector database built from scratch to understand how systems like ChromaDB and
 - [x] In-memory vector storage
 - [x] Brute-force cosine similarity search
 - [x] Metadata filtering
-- [ ] Persistence (save/load)
+- [x] Persistence (save/load)
 
 ## Known Limitations
 
