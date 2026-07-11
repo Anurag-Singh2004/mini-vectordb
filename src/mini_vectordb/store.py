@@ -50,3 +50,13 @@ class VectorStore:
             
         results = sorted(heap, key=lambda x: x[0], reverse=True)
         return [(self._records[record_id], score) for score, record_id in results]
+    
+
+    def save(self, path:str)-> None:
+        from mini_vectordb.persistence import save_to_file  #importing here fixed circular import error
+        save_to_file(self, path)
+    
+    @classmethod
+    def load(cls, path:str)->"VectorStore":
+        from mini_vectordb.persistence import load_from_file
+        return load_from_file(path)
